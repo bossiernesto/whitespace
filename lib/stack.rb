@@ -1,6 +1,8 @@
 #TODO: add documentation using rDoc
 class WsStack < Array
 
+  attr_accessor :stack
+
   def initialize
     @stack=[]
   end
@@ -12,11 +14,10 @@ class WsStack < Array
 
   def pop
     @stack.pop
-    return self
   end
 
   def popRelative(pos)
-    newpos=-(pos.abs)
+    newpos=(pos.abs)
     if newpos>self.count
       return @stack.pop(self.count)
     end
@@ -31,7 +32,7 @@ class WsStack < Array
   end
 
   def count
-    @stack.length
+    @stack.count
   end
 
   def look(pos) #retrieve value from top of stack stack relative position
