@@ -1,3 +1,4 @@
+#TODO: add documentation using rDoc
 class WsStack < Array
 
   def initialize
@@ -14,14 +15,14 @@ class WsStack < Array
     return self
   end
 
-  def pop_relative(pos)
+  def popRelative(pos)
     newpos=-(pos.abs)
     if newpos>self.count
       return @stack.pop(self.count)
     end
     temp=@stack.pop(newpos)
     extracted=temp.first
-    @stack+=temp[1:-1]
+    @stack+=temp[1..-1]
     return extracted
   end
 
@@ -35,13 +36,28 @@ class WsStack < Array
 
   def look(pos) #retrieve value from top of stack stack relative position
     newpos=-(pos.abs)
-    if newpos>self.count
-      return @stack.first
-    end
-    return @stack[newpos]
-
+     if newpos>=self.count
+       return @stack.first
+     end
+     return @stack[newpos]
   end
 
+  def dupTop()
+    #Duplicate the top item on the stack
+    value=@stack.pop
+    2.times {@stack.push(value)}
+  end
 
+  def swapTop()
+    #Swap the two top items in the Stack
+    newItems=[]
+    2.times {newItems.push(@stack.pop)}
+    @stack+=newItems
+  end
 
+  def copy(pos)
+     #copy the nth item on the stack onto the top of the stack
+     value=self.look(pos)
+     @stack.push(value)
+  end
 end
