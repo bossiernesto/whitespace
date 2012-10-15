@@ -1,5 +1,5 @@
 require "test/unit"
-require "lib/microprocessor"
+require "../lib/assembler"
 
 class MyTest < Test::Unit::TestCase
 
