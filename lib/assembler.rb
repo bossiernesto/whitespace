@@ -14,6 +14,7 @@ class Assembler
     @ops=Instruction.getAssembleTable()
   end
 
+  #TODO: make assemble to be able to process inline instructions and flows
   public
   def assemble(file)
     self.setUpFiles(file)

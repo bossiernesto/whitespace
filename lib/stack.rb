@@ -18,7 +18,7 @@ class WsStack < Array
 
   def popRelative(pos)
     newpos=(pos.abs)
-    if newpos>self.count
+    if newpos>=self.count
       return @stack.pop(self.count)
     end
     temp=@stack.pop(newpos)
