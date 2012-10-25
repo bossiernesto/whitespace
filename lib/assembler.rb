@@ -8,7 +8,7 @@ $logger=Logger.new("../WSLog.log",5,10*1024)
 class Assembler
   include TranslateTable
 
-  attr_accessor :stack,:source,:ops,:dest
+  attr_accessor :source,:ops,:dest
 
   def initialize
     @ops=Instruction.getAssembleTable()
