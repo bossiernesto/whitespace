@@ -37,6 +37,8 @@ module TranslateTable
       ["\t\n\t\t", :readnum],
   ]
 
+  BYTECODE_TABLE=TRANSLATE_TABLE.inject(Hash.new{|h,k|h[k]=[]}) { |h, dict| h[dict[0]] << dict;h}
+
   def getImpType(instr)
     fail(NotImplementedError) #TODO: implement
   end
@@ -53,3 +55,4 @@ module TranslateTable
   end
 
 end
+

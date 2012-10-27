@@ -8,19 +8,22 @@ $logger=Logger.new("../WSLog.log",5,10*1024)
 class Assembler
   include TranslateTable
 
-  attr_accessor :source,:ops,:dest
+  attr_accessor :source,:ops,:dest,:bytecode
 
-  def initialize
-    @ops=Instruction.getAssembleTable()
+  def initialize(bytecode=FALSE)
+    @ops=Instruction.getAssembleTable() #TODO create bytecode table
+    @bytecode=bytecode
+    @encoders={:signed => :encode_signed,
+               :unsigned= => :encode_unsigned}
   end
 
   #TODO: make assemble to be able to process inline instructions and flows
   public
   def assemble(file)
-    self.setUpFiles(file)
+    self.setup_files(file)
     begin
-      for line in @source
-        line=self.removeComments(line)
+      @source.each do |line|
+        line=self.remove_comments(line)
         next if line.empty?
         if line =~ /^(\d+):$/
           translate("label #{$1}")
@@ -29,23 +32,23 @@ class Assembler
         end
       end
     rescue
-      $logger.error(self.informSourceLocation("Error assembling file"))
+      $logger.error(self.source_location("Error assembling file"))
     ensure
       @source.close unless @source.nil?
       @dest.close unless @dest.nil?
     end
   end
 
-  def encodeSignedNumber(n)
-    (n >= 0 ? " " : "\t") + encodeUnsignedNumber(n.abs)
+  def encode_signed(n)
+    (n >= 0 ? " " : "\t") + encode_unsigned(n.abs)
   end
 
-  def encodeUnsignedNumber(n)
+  def encode_unsigned(n)
     ("%b" % n).tr("01", " \t") + "\n"
   end
 
   protected
-  def setUpFiles(file)
+  def setup_files(file)
     filename=file
     if File.extname(file)=='.ws'
        $logger.info("File can't be of extension .ws renaming to .wsa")
@@ -56,11 +59,11 @@ class Assembler
     @dest=File.open(rename_file_extension(file,'ws'),"w")
   end
 
-  def informSourceLocation(message)
+  def source_location(message)
     "Source #{@source.path} at #{@source.lineno}: #{message}"
   end
 
-  def removeComments(string)
+  def remove_comments(string)
     string.strip.gsub(/#.*$/, "")
   end
 
@@ -69,11 +72,13 @@ class Assembler
       r=self.buildRegEx(opcode,arg)
       if line =~ Regexp.new(r)
         @dest.print ws
-        case arg
-          when :signed
-            @dest.print encodeSignedNumber($1.to_i)
-          when :unsigned
-            @dest.print encodeUnsignedNumber($1.to_i)
+        if args
+          begin
+            encode=send @encoders[arg], $1.to_i
+            @dest.print encode
+            rescue NoMethodError
+              raise(InvalidWhitespaceArgument)
+          end
         end
       end
     end
@@ -84,5 +89,9 @@ end
 
 
 class InstructionNotFound < Exception
+
+end
+
+class InvalidWhitespaceArgument < Exception
 
 end
